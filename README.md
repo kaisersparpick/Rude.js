@@ -9,7 +9,7 @@
 ```js
 var rude = new Rude();
 ```
-The constructor accepts an optional parameter for the default scope. Callbacks with no explicit scope will use this default when invoked.
+The constructor accepts an optional parameter for the default scope. Callbacks with no explicit binding will use this default when invoked.
 ```js
 var c = new SomeClass();
 var rude = new Rude(c);
@@ -20,12 +20,12 @@ var rude = new Rude(c);
 rude.addRule(condition, yesCallback, noCallback);
 ```
 
-`addRule` accepts three arguments: the condition to check, the function to call when the result is true, and the function to call when it is false. Each argument can be a function, a **rule object** or `undefined`.
+`addRule` accepts three arguments: the condition to check, the function to call when the result is true, and the function to call when it is false. Each argument can be a function or `undefined`.
 
-A **rule object** takes the form of `{ cb: callback, scope: instance }`
+To set the desired value of `this`, use the `.bind()` method
 
 ```js
-rude.addRule(someFunction, SomeClass.staticMethod, { cb: obj.instanceMethod, scope: obj });
+rude.addRule(someFunction, SomeClass.staticMethod, obj.instanceMethod.bind(obj));
 ```
 
 When a condition returns `null`, Rude exits the condition chain. In this case, the yes and no callbacks are not necessary, therefore they can be left empty -- i.e. `undefined`. These conditions are usually exit points.
@@ -37,12 +37,12 @@ Rude automatically generates a key for each rule based on the condition callback
 
 #### Checking conditions
 
-Checking conditions based on the applied rules is triggered by calling `rude.check()` with a stringified function name. `rude.check()` returns true when finished.
+Checking conditions based on the applied rules is triggered by calling `rude.check()` with a function. `rude.check()` returns true when finished.
 
 ```js
-rude.check("someFunction");
+rude.check(someFunction);
 ```
 
-This specifies the entry point in the condition chain and can be set to any valid rule name.
+This specifies the entry point in the condition chain and can be set to any valid rule condition.
 
 See a full application in the **examples** folder.
