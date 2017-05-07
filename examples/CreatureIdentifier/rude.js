@@ -13,16 +13,14 @@ class Rude {
         this.log = [];
     }
 
-    check(ruleName) {
-        if (!ruleName) return false;
+    check(condition) {
+        if (typeof condition !== "function") throw Error("Condition must be a function");
+        let ruleName = condition.name;
 
-        let loop = true;
-        while (loop) {
+        while (true) {
             let rule = this.rules[ruleName];
             if (!rule) break;
-            let currentScope = rule.condition.scope || this.scope;
-            let result = currentScope ? rule.condition.cb.call(currentScope) : rule.condition.cb();
-
+            let result = rule.condition.bound ? rule.condition.cb() : rule.condition.cb.call(this.scope);
             this.log.push({ ruleName, result });
 
             if (result === null) break;
@@ -37,11 +35,11 @@ class Rude {
     }
 
     static processArg(arg) {
-        if (typeof arg !== "function" && typeof arg !== "object" && typeof arg !== "undefined")
+        if (typeof arg !== "function" && typeof arg !== "undefined")
             throw Error("Invalid argument");
 
         if (typeof arg === "function")
-            arg = { cb: arg, scope: undefined };
+            arg = { cb: arg, bound: (arg.name.startsWith("bound ")) };
 
         return arg;
     }

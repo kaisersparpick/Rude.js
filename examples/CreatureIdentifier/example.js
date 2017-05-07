@@ -50,7 +50,7 @@ class SmartPrinter {
     }
 }
 
-function getMyVerySecretValue(val) { return val + 2; }
+var getMyVerySecretValue = function(val) { return val + 2; };
 function hasOneHorn() {
     var one = CleverCreatureIdentifier.type === "mythical";
     c.result = one ? "a unicorn" : "a stag";
@@ -61,16 +61,16 @@ var c = new CleverCreatureIdentifier();
 var s = new SmartPrinter(c);
 
 var rude = new Rude(c);
-rude.addRule(c.isAnimal, c.hasLegs, { cb: s.creatureFound, scope: s });
-rude.addRule(c.hasLegs, c.hasTwoLegs, { cb: s.creatureFound, scope: s });
+rude.addRule(c.isAnimal, c.hasLegs, s.creatureFound.bind(s));
+rude.addRule(c.hasLegs, c.hasTwoLegs, s.creatureFound.bind(s));
 rude.addRule(c.hasTwoLegs, c.canRead, CleverCreatureIdentifier.hasHorns);
-rude.addRule(c.canRead, { cb: s.creatureFound, scope: s }, { cb: s.creatureFound, scope: s });
-rude.addRule(CleverCreatureIdentifier.hasHorns, hasOneHorn, { cb: s.poodle, scope: s });
-rude.addRule(hasOneHorn, { cb: s.creatureFound, scope: s }, { cb: s.creatureFound, scope: s });
-rude.addRule({ cb: s.creatureFound, scope: s });
+rude.addRule(c.canRead, s.creatureFound.bind(s), s.creatureFound.bind(s));
+rude.addRule(CleverCreatureIdentifier.hasHorns, hasOneHorn, s.poodle.bind(s));
+rude.addRule(hasOneHorn, s.creatureFound.bind(s), s.creatureFound.bind(s));
+rude.addRule(s.creatureFound.bind(s));
 
 // Entry point:
-rude.check("isAnimal");
+rude.check(c.isAnimal);
 
 s.printResult();
 s.printLog(rude.generateLog());
